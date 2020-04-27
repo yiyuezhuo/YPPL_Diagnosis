@@ -7,7 +7,7 @@ import StatsBase: autocor
 """
 theta_arr: Array, (chains, draws)
 """
-function R_hat(theta_arr)
+function R_hat(theta_arr::Matrix)
     M, N = size(theta_arr)
     theta_mean = mean(theta_arr, dims=2)
     theta_mean_mean = mean(theta_mean)
@@ -19,7 +19,7 @@ function R_hat(theta_arr)
     return R_hat
 end
 
-function split_chains(theta_arr)
+function split_chains(theta_arr::Matrix)
     M, N = size(theta_arr)
     split_N = N ÷ 2
     split_theta_arr = similar(theta_arr, M*2, split_N)
@@ -33,14 +33,14 @@ end
 """
 theta_arr: Array, (chains, draws)
 """
-function split_R_hat(theta_arr)
+function split_R_hat(theta_arr::Matrix)
     return R_hat(split_chains(theta_arr))
 end
 
 """
 theta_arr: Array, (chains, draws)
 """
-function ess(theta_arr)
+function ess(theta_arr::Matrix)
     M, N = size(theta_arr)
     theta_mean = mean(theta_arr, dims=2)
     theta_mean_mean = mean(theta_mean)
@@ -84,8 +84,8 @@ Stan equivalent reference output:
            mean se_mean     sd   2.5%    25%    50%    75%  97.5%  n_eff   Rhat
 mu         7.96    0.18   5.38   -2.5   4.53   7.86  11.24  19.07    866    1.0
 """
-function mcmc_summary(posterior)
-    data_mat = Matrix(undef, size(posterior, 3), 10)
+function mcmc_summary(posterior::Array{T, 3}) where T <: Real
+    data_mat = Matrix{T}(undef, size(posterior, 3), 10)
     for pid in 1:size(posterior, 3)
         post = posterior[:, :, pid]
         n_eff = ess(post)
